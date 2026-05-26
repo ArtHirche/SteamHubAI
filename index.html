@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SteamHub IA - Gerencie seu Backlog da Steam com Inteligência Artificial</title>
+    <!-- Google Fonts: Inter & Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app">
+      <!-- MAIN CONTAINER -->
+      <div class="dashboard-container">
+        
+        <!-- SIDEBAR (FILTERS & STEAM STATUS) -->
+        <aside class="sidebar">
+          <div class="brand">
+            <svg class="brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+              <path d="M12 .002a12 12 0 0 0-11.96 10.82l5.52 2.29a3.7 3.7 0 0 1 4.18-.72l3.07-4.4a3.7 3.7 0 1 1 .63.63l-4.4 3.07a3.72 3.72 0 0 1-.72 4.17l2.29 5.53A12 12 0 1 0 12 .002zm-3.23 14.5a1.73 1.73 0 1 1-2.45-2.45 1.73 1.73 0 0 1 2.45 2.45zm8.44-8.44a1.73 1.73 0 1 1-2.45-2.45 1.73 1.73 0 0 1 2.45 2.45z"/>
+            </svg>
+            <h2>SteamHub<span>IA</span></h2>
+          </div>
+
+          <!-- SEARCH -->
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-input" placeholder="Buscar jogo na biblioteca..." autocomplete="off">
+          </div>
+
+          <!-- STEAM CONNECTION PANEL -->
+          <div class="sidebar-section">
+            <h3>Integração Steam</h3>
+            <div class="steam-connection-box">
+              <div class="steam-logo-header">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                  <path d="M12 .002a12 12 0 0 0-11.96 10.82l5.52 2.29a3.7 3.7 0 0 1 4.18-.72l3.07-4.4a3.7 3.7 0 1 1 .63.63l-4.4 3.07a3.72 3.72 0 0 1-.72 4.17l2.29 5.53A12 12 0 1 0 12 .002zm-3.23 14.5a1.73 1.73 0 1 1-2.45-2.45 1.73 1.73 0 0 1 2.45 2.45zm8.44-8.44a1.73 1.73 0 1 1-2.45-2.45 1.73 1.73 0 0 1 2.45 2.45z"/>
+                </svg>
+                <span>Sincronizador Oficial</span>
+              </div>
+              <span class="steam-status-lbl" id="steam-status-label">Status: Desconectado</span>
+              <button class="btn-steam-connect" id="btn-steam-connect-trigger">Sincronizar Steam</button>
+            </div>
+            
+            <button class="btn-demo-mode" id="btn-demo-mode">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Carregar Biblioteca de Demonstração
+            </button>
+          </div>
+
+          <!-- STATUS FILTER -->
+          <div class="sidebar-section">
+            <h3>Filtrar por Status</h3>
+            <div class="status-filters-group">
+              <label class="status-checkbox">
+                <input type="checkbox" value="not-started" checked>
+                <span class="checkmark"></span>
+                Não Iniciado (Backlog)
+              </label>
+              <label class="status-checkbox">
+                <input type="checkbox" value="want-to-play" checked>
+                <span class="checkmark"></span>
+                Quero Jogar
+              </label>
+              <label class="status-checkbox">
+                <input type="checkbox" value="playing" checked>
+                <span class="checkmark"></span>
+                Jogando
+              </label>
+              <label class="status-checkbox">
+                <input type="checkbox" value="played" checked>
+                <span class="checkmark"></span>
+                Já Joguei
+              </label>
+              <label class="status-checkbox">
+                <input type="checkbox" value="abandoned" checked>
+                <span class="checkmark"></span>
+                Abandonados
+              </label>
+            </div>
+          </div>
+
+          <!-- GENRE FILTER -->
+          <div class="sidebar-section">
+            <h3>Filtrar por Estilo / Gênero</h3>
+            <div class="genre-tags" id="genre-container">
+              <!-- Dynamic Genres will be placed here -->
+            </div>
+          </div>
+        </aside>
+
+        <!-- MAIN DASHBOARD CONTENT -->
+        <main class="main-content">
+          <!-- TOP NAVBAR -->
+          <header class="top-navbar">
+            <div class="nav-left">
+              <h1>Minha Biblioteca Steam</h1>
+              <p class="subtitle">Gerencie seu progresso e escolha sua próxima aventura</p>
+            </div>
+            <div class="nav-right">
+              <button class="btn-primary" id="btn-add-game">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Adicionar Jogo Manual
+              </button>
+            </div>
+          </header>
+
+          <!-- QUICK STATISTICS CARDS -->
+          <section class="stats-row">
+            <div class="stat-card">
+              <div class="stat-icon-wrapper purple">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h4 id="stat-total">0</h4>
+                <p>Jogos Totais</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrapper green">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h4 id="stat-playing">0</h4>
+                <p>Jogando</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrapper yellow">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h4 id="stat-played">0</h4>
+                <p>Já Joguei</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrapper blue">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h4 id="stat-backlog">0</h4>
+                <p>Quero Jogar</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrapper red">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                  <line x1="12" y1="2" x2="12" y2="12"></line>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h4 id="stat-abandoned">0</h4>
+                <p>Abandonados</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- LIBRARY VIEW & EMPTY STATE -->
+          <div class="library-wrapper">
+            <div class="library-header">
+              <span class="active-filters-info" id="filters-status-text">Mostrando todos os jogos</span>
+              <button class="btn-text" id="btn-clear-filters" style="display: none;">Limpar Filtros</button>
+            </div>
+            
+            <!-- GRID DE JOGOS -->
+            <div class="games-grid" id="games-grid">
+              <!-- Games dynamically generated -->
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div class="empty-state" id="empty-state">
+              <div class="empty-icon-wrapper">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                  <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                  <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                  <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                </svg>
+              </div>
+              <h3>Sua biblioteca Steam está vazia</h3>
+              <p>Sincronize com sua conta da Steam oficial utilizando sua chave de API ou carregue nossa biblioteca de demonstração para testar.</p>
+              <div class="empty-actions">
+                <button class="btn-primary" id="btn-empty-connect">Sincronizar Conta Steam</button>
+                <span class="or-separator">ou</span>
+                <button class="btn-secondary" id="btn-empty-demo">Usar Biblioteca de Teste</button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <!-- AI RECOMMENDATION SIDE-DRAWER -->
+        <aside class="ai-panel">
+          <div class="ai-header">
+            <div class="ai-title-group">
+              <svg class="ai-title-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l-7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+              <h3>Recomendador <span>IA</span></h3>
+            </div>
+            <p>Seu assistente virtual para decidir o próximo jogo.</p>
+          </div>
+
+          <!-- AI CORE WORKSPACE -->
+          <div class="ai-body">
+            <div class="ai-brain-container">
+              <div class="ai-brain-ring ring-1"></div>
+              <div class="ai-brain-ring ring-2"></div>
+              <div class="ai-brain-ring ring-3"></div>
+              <img id="ai-brain-image" class="ai-brain-core" src="" alt="Neural Core">
+            </div>
+
+            <!-- TERMINAL LOGS -->
+            <div class="ai-console">
+              <div class="console-header">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span class="console-title">assistant@steamhub:~$</span>
+              </div>
+              <div class="console-body" id="ai-console-logs">
+                <div class="console-line text-muted">Aguardando solicitação para analisar biblioteca...</div>
+              </div>
+            </div>
+
+            <!-- RESULT CARD -->
+            <div class="ai-result-card" id="ai-result-card">
+              <!-- Recommended Game UI will be rendered here -->
+            </div>
+          </div>
+
+          <div class="ai-footer">
+            <button class="btn-ai-action" id="btn-trigger-ai">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              </svg>
+              Sugerir Próximo Jogo
+            </button>
+          </div>
+        </aside>
+
+      </div>
+
+      <!-- ================= MODALS ================= -->
+
+      <!-- STEAM API CONNECTION MODAL -->
+      <div class="modal-overlay" id="modal-sync">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div class="modal-title-wrapper">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M12 .002a12 12 0 0 0-11.96 10.82l5.52 2.29a3.7 3.7 0 0 1 4.18-.72l3.07-4.4a3.7 3.7 0 1 1 .63.63l-4.4 3.07a3.72 3.72 0 0 1-.72 4.17l2.29 5.53A12 12 0 1 0 12 .002zm-3.23 14.5a1.73 1.73 0 1 1-2.45-2.45 1.73 1.73 0 0 1 2.45 2.45zm8.44-8.44a1.73 1.73 0 1 1-2.45-2.45 1.73 1.73 0 0 1 2.45 2.45z"/>
+              </svg>
+              <h3>Sincronizar com a Steam API</h3>
+            </div>
+            <button class="btn-close" id="btn-close-sync">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <form id="form-sync-account">
+              <p class="modal-description">
+                Conecte-se à Steam Web API real para importar sua biblioteca de jogos e tempos de jogo reais. Suas chaves de acesso são salvas apenas em seu navegador.
+              </p>
+
+              <div class="input-group">
+                <label for="sync-steam-key">Chave de API da Steam (Steam Web API Key)</label>
+                <input type="text" id="sync-steam-key" placeholder="Insira sua Steam API Key..." required>
+                <span class="input-helper">
+                  Você pode obter uma chave oficial em 
+                  <a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">steamcommunity.com/dev/apikey</a>.
+                </span>
+              </div>
+
+              <div class="input-group">
+                <label for="sync-steam-id">SteamID 64</label>
+                <input type="text" id="sync-steam-id" placeholder="Ex: 76561198032541375" required>
+                <span class="input-helper">
+                  Seu número de ID de 17 dígitos. Descubra em 
+                  <a href="https://steamid.io/" target="_blank" rel="noopener">steamid.io</a> caso use uma URL personalizada.
+                  Certifique-se de que a visibilidade de sua <b>lista de jogos</b> esteja configurada como <b>Pública</b> nas opções de privacidade da Steam!
+                </span>
+              </div>
+
+              <!-- ANIMATED SYNCING STATUS (Hidden initially) -->
+              <div class="sync-progress-container" id="sync-progress-container" style="display: none;">
+                <div class="progress-bar-wrapper">
+                  <div class="progress-bar-fill" id="sync-progress-fill"></div>
+                </div>
+                <div class="sync-log-terminal">
+                  <div id="sync-log-output">Iniciando conexão...</div>
+                </div>
+              </div>
+
+              <div class="modal-actions" id="modal-sync-actions">
+                <button type="button" class="btn-secondary" id="btn-cancel-sync">Cancelar</button>
+                <button type="submit" class="btn-primary" id="btn-confirm-sync">Importar Biblioteca Real</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD CUSTOM GAME MODAL -->
+      <div class="modal-overlay" id="modal-add-game">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3>Adicionar Jogo Manualmente</h3>
+            <button class="btn-close" id="btn-close-add">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <form id="form-add-game">
+              <div class="input-group">
+                <label for="add-title">Título do Jogo</label>
+                <input type="text" id="add-title" placeholder="Ex: Elden Ring" required>
+              </div>
+
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="add-status">Status Atual</label>
+                  <select id="add-status" required>
+                    <option value="not-started">Não Iniciado (Backlog)</option>
+                    <option value="want-to-play">Quero Jogar</option>
+                    <option value="playing">Jogando</option>
+                    <option value="played">Já Joguei</option>
+                    <option value="abandoned">Abandonado</option>
+                  </select>
+                </div>
+                
+                <div class="input-group">
+                  <label for="add-playtime">Tempo Jogado (Horas)</label>
+                  <input type="number" id="add-playtime" placeholder="Ex: 12" min="0" value="0">
+                </div>
+              </div>
+
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="add-genre">Gêneros (separados por vírgula)</label>
+                  <input type="text" id="add-genre" placeholder="Ex: RPG, Ação, Difícil" required>
+                </div>
+                
+                <div class="input-group">
+                  <label for="add-appid">Steam AppID (Opcional)</label>
+                  <input type="number" id="add-appid" placeholder="Ex: 1245620">
+                  <span class="input-helper">Usado para baixar a capa oficial da Steam.</span>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label for="add-cover">URL Alternativa da Capa (Opcional)</label>
+                <input type="url" id="add-cover" placeholder="https://exemplo.com/capa.jpg">
+                <span class="input-helper">Deixe em branco para usar a capa oficial ou capa gerada automaticamente.</span>
+              </div>
+
+              <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="btn-cancel-add">Cancelar</button>
+                <button type="submit" class="btn-primary">Adicionar Jogo</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
